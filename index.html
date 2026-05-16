@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#f6f4ef" />
+  <title>Commute Cost Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="effect-layer" class="effect-layer" aria-hidden="true"></div>
+  <main class="app">
+    <header class="app-header">
+      <div class="header-row">
+        <div class="logo">
+          <h1>Trip Cost</h1>
+        </div>
+        <button id="settings-button" type="button" class="icon-button" aria-label="Open settings" aria-controls="settings-panel" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+      </div>
+      <p class="tagline">Know what your drive really costs.</p>
+    </header>
+
+    <!-- Input screen -->
+    <section id="input-screen" class="screen active" aria-label="Trip details">
+      <div class="segmented home-mode" role="radiogroup" aria-label="Input mode">
+        <button type="button" class="segmented-option is-active" role="radio" aria-checked="true" data-home-mode="manual">
+          <span class="segmented-title">Manual</span>
+        </button>
+        <button type="button" class="segmented-option" role="radio" aria-checked="false" data-home-mode="saved">
+          <span class="segmented-title">Saved Vehicles</span>
+        </button>
+      </div>
+
+      <form id="trip-form" class="card-stack home-pane" data-pane="manual" novalidate>
+        <div class="input-card">
+          <label for="economy">
+            <span class="label-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 22V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16" />
+                <path d="M3 12h11" />
+                <path d="M14 8h3l3 3v8a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2" />
+                <path d="M17 14v-3" />
+              </svg>
+            </span>
+            <span class="label-text">
+              <span class="label-title">Fuel economy</span>
+              <span class="label-hint" data-hint="economy">L / 100 km</span>
+            </span>
+          </label>
+          <input id="economy" name="economy" type="number" inputmode="decimal" min="0" step="0.1" placeholder="8.5" autocomplete="off" required />
+        </div>
+
+        <div class="input-card">
+          <label for="distance">
+            <span class="label-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-7.58 8-13a8 8 0 1 0-16 0c0 5.42 8 13 8 13z" />
+                <circle cx="12" cy="9" r="2.5" />
+              </svg>
+            </span>
+            <span class="label-text">
+              <span class="label-title">Distance travelled</span>
+              <span class="label-hint" data-hint="distance">kilometres</span>
+            </span>
+          </label>
+          <input id="distance" name="distance" type="number" inputmode="decimal" min="0" step="0.1" placeholder="42" autocomplete="off" required />
+        </div>
+
+        <div class="input-card">
+          <label for="price">
+            <span class="label-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v18" />
+                <path d="M16 7H10a2.5 2.5 0 0 0 0 5h4a2.5 2.5 0 0 1 0 5H8" />
+              </svg>
+            </span>
+            <span class="label-text">
+              <span class="label-title" data-title="price">Gas price</span>
+              <span class="label-hint" data-hint="price">$ per litre</span>
+            </span>
+          </label>
+          <input id="price" name="price" type="number" inputmode="decimal" min="0" step="0.001" placeholder="1.659" autocomplete="off" required />
+        </div>
+
+        <button type="submit" class="primary-button">
+          <span>Calculate</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="m13 6 6 6-6 6" />
+          </svg>
+        </button>
+      </form>
+
+      <!-- Saved Vehicles pane -->
+      <form id="saved-form" class="card-stack home-pane" data-pane="saved" hidden novalidate>
+        <div id="saved-empty" class="empty-state" hidden>
+          <div class="empty-state-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 17h13V5H3z" />
+              <path d="M16 8h3l2 3v6h-5" />
+              <circle cx="7.5" cy="17.5" r="1.5" />
+              <circle cx="17.5" cy="17.5" r="1.5" />
+            </svg>
+          </div>
+          <p class="empty-title">No vehicles saved yet</p>
+          <p class="empty-hint">Open <strong>Settings</strong> and add a vehicle to use this tab.</p>
+        </div>
+
+        <div id="saved-content">
+          <div class="tag-group">
+            <span class="setting-tag">Your Vehicle</span>
+            <div id="vehicle-picker" class="option-list" role="radiogroup" aria-label="Vehicle"></div>
+          </div>
+
+          <div class="tag-group">
+            <span class="setting-tag">Driving Style</span>
+            <div class="segmented" role="radiogroup" aria-label="Driving style">
+              <button type="button" class="segmented-option" role="radio" aria-checked="false" data-style="highway">
+                <span class="segmented-title">Highway</span>
+              </button>
+              <button type="button" class="segmented-option" role="radio" aria-checked="false" data-style="city">
+                <span class="segmented-title">City</span>
+              </button>
+              <button type="button" class="segmented-option is-active" role="radio" aria-checked="true" data-style="combined">
+                <span class="segmented-title">Combined</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="input-card">
+            <label for="saved-distance">
+              <span class="label-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-7.58 8-13a8 8 0 1 0-16 0c0 5.42 8 13 8 13z" />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
+              </span>
+              <span class="label-text">
+                <span class="label-title">Distance travelled</span>
+                <span class="label-hint" data-hint="distance-saved">kilometres</span>
+              </span>
+            </label>
+            <input id="saved-distance" name="distance" type="number" inputmode="decimal" min="0" step="0.1" placeholder="42" autocomplete="off" required />
+          </div>
+
+          <div class="input-card">
+            <label for="saved-price">
+              <span class="label-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3v18" />
+                  <path d="M16 7H10a2.5 2.5 0 0 0 0 5h4a2.5 2.5 0 0 1 0 5H8" />
+                </svg>
+              </span>
+              <span class="label-text">
+                <span class="label-title" data-title="price-saved">Gas price</span>
+                <span class="label-hint" data-hint="price-saved">$ per litre</span>
+              </span>
+            </label>
+            <input id="saved-price" name="price" type="number" inputmode="decimal" min="0" step="0.001" placeholder="1.659" autocomplete="off" required />
+          </div>
+
+          <button type="submit" class="primary-button">
+            <span>Calculate</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m13 6 6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Results screen -->
+    <section id="results-screen" class="screen" aria-label="Trip results" aria-hidden="true">
+      <div class="card-stack">
+        <article class="result-card result-cost">
+          <div class="result-header">
+            <span class="result-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M15 9H10.5a2 2 0 0 0 0 4h3a2 2 0 0 1 0 4H9" />
+                <path d="M12 7v10" />
+              </svg>
+            </span>
+            <h2>Trip cost</h2>
+          </div>
+          <p class="result-value">
+            <span class="unit-prefix">$</span><span class="count" data-target="0" data-decimals="2">0.00</span>
+          </p>
+          <p class="result-sub">Fuel spend for this trip</p>
+        </article>
+
+        <article class="result-card result-fuel">
+          <div class="result-header">
+            <span class="result-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2s5 6 5 10a5 5 0 0 1-10 0c0-4 5-10 5-10z" />
+              </svg>
+            </span>
+            <h2>Fuel used</h2>
+          </div>
+          <p class="result-value">
+            <span class="count" data-target="0" data-decimals="2">0.00</span><span class="unit-suffix" data-suffix="fuel">L</span>
+          </p>
+          <p class="result-sub" data-sub="fuel">Litres burned on the road</p>
+        </article>
+
+        <article class="result-card result-co2">
+          <div class="result-header">
+            <span class="result-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 18a5 5 0 1 1 1.4-9.8A6.5 6.5 0 0 1 21 11.5 4.5 4.5 0 0 1 16.5 18z" />
+              </svg>
+            </span>
+            <h2>Carbon emissions</h2>
+          </div>
+          <p class="result-value">
+            <span class="count" data-target="0" data-decimals="2">0.00</span><span class="unit-suffix">kg CO₂</span>
+          </p>
+          <p class="result-sub" data-sub="co2">Roughly 2.31 kg per litre of gasoline</p>
+        </article>
+
+        <button id="reset-button" type="button" class="secondary-button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 3-6.7" />
+            <path d="M3 4v5h5" />
+          </svg>
+          <span>New trip</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Settings panel -->
+  <aside id="settings-panel" class="slide-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title" aria-hidden="true">
+    <div class="settings-inner">
+      <header class="settings-header">
+        <h2 id="settings-title">Settings</h2>
+        <button id="settings-close" type="button" class="icon-button" aria-label="Close settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </header>
+
+      <section class="settings-group" aria-labelledby="units-label">
+        <h3 id="units-label" class="settings-group-label">Units of measure</h3>
+        <div class="segmented" role="radiogroup" aria-labelledby="units-label">
+          <button type="button" class="segmented-option" role="radio" aria-checked="true" data-units="metric">
+            <span class="segmented-title">Metric</span>
+            <span class="segmented-hint">Litres &amp; km</span>
+          </button>
+          <button type="button" class="segmented-option" role="radio" aria-checked="false" data-units="imperial">
+            <span class="segmented-title">Imperial</span>
+            <span class="segmented-hint">Gallons &amp; miles</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="settings-group" aria-labelledby="fuel-label">
+        <h3 id="fuel-label" class="settings-group-label">Fuel type</h3>
+        <div class="option-list" role="radiogroup" aria-labelledby="fuel-label">
+          <button type="button" class="option-row" role="radio" aria-checked="true" data-fuel="gasoline">
+            <span class="option-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 2s5 6 5 10a5 5 0 0 1-10 0c0-4 5-10 5-10z" />
+              </svg>
+            </span>
+            <span class="option-text">
+              <span class="option-title">Gasoline</span>
+              <span class="option-hint"><span class="co2-number">2.31</span> kg CO₂ / <span class="co2-unit">L</span></span>
+            </span>
+            <span class="option-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-11" /></svg>
+            </span>
+          </button>
+
+          <button type="button" class="option-row" role="radio" aria-checked="false" data-fuel="diesel">
+            <span class="option-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="6" width="14" height="12" rx="2" />
+                <path d="M17 10h2l2 3v5h-4" />
+              </svg>
+            </span>
+            <span class="option-text">
+              <span class="option-title">Diesel</span>
+              <span class="option-hint"><span class="co2-number">2.68</span> kg CO₂ / <span class="co2-unit">L</span></span>
+            </span>
+            <span class="option-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-11" /></svg>
+            </span>
+          </button>
+
+          <button type="button" class="option-row" role="radio" aria-checked="false" data-fuel="natural-gas">
+            <span class="option-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 3c0 4-4 5-4 9a7 7 0 0 0 14 0c0-3-2-5-4-8-1 3-3 4-3 7" />
+              </svg>
+            </span>
+            <span class="option-text">
+              <span class="option-title">Natural gas <span class="option-tag">CNG</span></span>
+              <span class="option-hint"><span class="co2-number">1.94</span> kg CO₂ / <span class="co2-unit">L-equiv.</span></span>
+            </span>
+            <span class="option-check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-11" /></svg>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <section class="settings-group" aria-labelledby="vehicles-label">
+        <h3 id="vehicles-label" class="settings-group-label">Your vehicles</h3>
+        <div id="settings-vehicle-list" class="vehicle-list"></div>
+        <button type="button" id="add-vehicle-button" class="secondary-button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+          <span>Add vehicle</span>
+        </button>
+      </section>
+
+      <section class="settings-group" aria-labelledby="theme-label">
+        <h3 id="theme-label" class="settings-group-label">Appearance</h3>
+        <button id="theme-toggle" type="button" class="theme-toggle" aria-pressed="false">
+          <span class="theme-toggle-icon" aria-hidden="true">
+            <!-- Sun (shown in light mode = "switch to dark") -->
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2" /><path d="M12 20v2" />
+              <path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" />
+              <path d="M2 12h2" /><path d="M20 12h2" />
+              <path d="m4.93 19.07 1.41-1.41" /><path d="m17.66 6.34 1.41-1.41" />
+            </svg>
+            <!-- Moon (shown in dark mode = "switch to light") -->
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+            </svg>
+          </span>
+          <span class="theme-toggle-label">
+            <span class="theme-toggle-title">Dark mode</span>
+            <span class="theme-toggle-hint" data-theme-hint>Off</span>
+          </span>
+          <span class="theme-toggle-switch" aria-hidden="true">
+            <span class="theme-toggle-thumb"></span>
+          </span>
+        </button>
+      </section>
+
+      <p class="settings-footnote">Settings save automatically.</p>
+    </div>
+  </aside>
+  <div id="settings-scrim" class="settings-scrim" aria-hidden="true"></div>
+
+  <!-- Confirmation modal -->
+  <div id="confirm-modal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" aria-hidden="true">
+    <div class="confirm-card" role="document">
+      <h2 id="confirm-title" class="confirm-title">Delete vehicle?</h2>
+      <p id="confirm-message" class="confirm-message">This can't be undone.</p>
+      <div class="confirm-actions">
+        <button type="button" id="confirm-cancel" class="secondary-button">Cancel</button>
+        <button type="button" id="confirm-ok" class="primary-button">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle editor panel (opens above settings) -->
+  <aside id="vehicle-editor" class="slide-panel editor-panel" role="dialog" aria-modal="true" aria-labelledby="editor-title" aria-hidden="true">
+    <div class="settings-inner">
+      <header class="settings-header">
+        <h2 id="editor-title">New vehicle</h2>
+        <button type="button" id="editor-close" class="icon-button" aria-label="Close vehicle editor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </header>
+
+      <form id="vehicle-form" class="card-stack" novalidate>
+        <div class="field-card">
+          <label for="vehicle-year">Year</label>
+          <input id="vehicle-year" name="year" type="number" inputmode="numeric" min="1900" max="2099" placeholder="2018" autocomplete="off" required />
+        </div>
+
+        <div class="field-card">
+          <label for="vehicle-make">Make</label>
+          <input id="vehicle-make" name="make" type="text" placeholder="Honda" autocomplete="off" required />
+        </div>
+
+        <div class="field-card">
+          <label for="vehicle-model">Model</label>
+          <input id="vehicle-model" name="model" type="text" placeholder="Civic" autocomplete="off" required />
+        </div>
+
+        <div class="field-card">
+          <label for="vehicle-highway">
+            Highway fuel economy
+            <span class="field-hint" data-vehicle-hint>L / 100 km</span>
+          </label>
+          <input id="vehicle-highway" name="highway" type="number" inputmode="decimal" min="0" step="0.1" placeholder="6.5" autocomplete="off" required />
+        </div>
+
+        <div class="field-card">
+          <label for="vehicle-city">
+            City fuel economy
+            <span class="field-hint" data-vehicle-hint>L / 100 km</span>
+          </label>
+          <input id="vehicle-city" name="city" type="number" inputmode="decimal" min="0" step="0.1" placeholder="8.2" autocomplete="off" required />
+        </div>
+
+        <div class="tag-group">
+          <span class="setting-tag">Fuel type</span>
+          <div id="vehicle-fuel-list" class="option-list" role="radiogroup" aria-label="Vehicle fuel type">
+            <button type="button" class="option-row is-active" role="radio" aria-checked="true" data-vehicle-fuel="gasoline">
+              <span class="option-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 2s5 6 5 10a5 5 0 0 1-10 0c0-4 5-10 5-10z" />
+                </svg>
+              </span>
+              <span class="option-text"><span class="option-title">Gasoline</span></span>
+              <span class="option-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-11" /></svg>
+              </span>
+            </button>
+            <button type="button" class="option-row" role="radio" aria-checked="false" data-vehicle-fuel="diesel">
+              <span class="option-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="6" width="14" height="12" rx="2" />
+                  <path d="M17 10h2l2 3v5h-4" />
+                </svg>
+              </span>
+              <span class="option-text"><span class="option-title">Diesel</span></span>
+              <span class="option-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-11" /></svg>
+              </span>
+            </button>
+            <button type="button" class="option-row" role="radio" aria-checked="false" data-vehicle-fuel="natural-gas">
+              <span class="option-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 3c0 4-4 5-4 9a7 7 0 0 0 14 0c0-3-2-5-4-8-1 3-3 4-3 7" />
+                </svg>
+              </span>
+              <span class="option-text"><span class="option-title">Natural gas <span class="option-tag">CNG</span></span></span>
+              <span class="option-check" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-11" /></svg>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="primary-button">
+          <span>Save vehicle</span>
+        </button>
+
+        <button type="button" id="vehicle-delete" class="secondary-button danger" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 6h18" />
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <path d="M19 6 18 20a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          </svg>
+          <span>Delete vehicle</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <script src="js/settings.js"></script>
+  <script src="js/vehicles.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/dialog.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
