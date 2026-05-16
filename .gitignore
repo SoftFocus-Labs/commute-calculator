@@ -1,0 +1,28 @@
+# macOS metadata
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+
+# Finder thumbnails
+.Spotlight-V100
+.Trashes
+
+# Network/iCloud metadata
+.fseventsd
+.TemporaryItems
+.DocumentRevisions-V100
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Editor / IDE local state
+.idea/
+.vscode/
+*.swp
+*.swo
