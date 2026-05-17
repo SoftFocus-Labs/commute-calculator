@@ -19,6 +19,7 @@
   const vehiclePicker = document.getElementById('vehicle-picker');
   const inputScreen = document.getElementById('input-screen');
   const resultsScreen = document.getElementById('results-screen');
+  const tripMeta = document.getElementById('trip-meta');
   const resetButton = document.getElementById('reset-button');
 
   const settingsButton = document.getElementById('settings-button');
@@ -40,6 +41,7 @@
   let vehicles = loadVehicles();
   let lastTripMetric = null;
   let lastTripFuelOverride = null;     // vehicle.fuelType when last calc was from saved mode
+  let lastTripVehicleName = null;      // populated for saved-mode calcs
   let editingVehicleId = null;
   let editorSelectedFuel = 'gasoline';
 
@@ -148,9 +150,12 @@
     // CO2 subtitle reflects the "effective" fuel — when results are showing
     // a saved-vehicle calc, the override pins the subtitle to the vehicle's fuel.
     const effectiveFuel = lastTripFuelOverride || settings.fuelType;
-    const co2 = getCo2Factor(effectiveFuel).toFixed(2);
+    const isImperial = settings.units === 'imperial';
+    const LITRES_PER_US_GALLON = 3.785411784;
+    const co2Factor = getCo2Factor(effectiveFuel) * (isImperial ? LITRES_PER_US_GALLON : 1);
+    const volumeUnit = isImperial ? 'gallon' : 'litre';
     document.querySelector('[data-sub="co2"]').textContent =
-      `Roughly ${co2} kg per litre of ${getFuelLabel(effectiveFuel)}`;
+      `Roughly ${co2Factor.toFixed(2)} kg per ${volumeUnit} of ${getFuelLabel(effectiveFuel)}`;
 
     applyFuelCo2Hints({ animate: options.animateFuelCo2 });
 
@@ -456,6 +461,49 @@
     animateAllCounts(resultsScreen);
   }
 
+  function formatTripDistance() {
+    if (!lastTripMetric) return null;
+    const isImperial = settings.units === 'imperial';
+    const value = isImperial ? lastTripMetric.distanceKm / 1.609344 : lastTripMetric.distanceKm;
+    const unit = isImperial ? 'mi' : 'km';
+    const rounded = parseFloat(value.toFixed(1));
+    return `${rounded} ${unit}`;
+  }
+
+  function formatTripPrice() {
+    if (!lastTripMetric) return null;
+    const isImperial = settings.units === 'imperial';
+    const value = isImperial ? lastTripMetric.pricePerL * 3.785411784 : lastTripMetric.pricePerL;
+    const unit = isImperial ? '/gal' : '/L';
+    const decimals = isImperial ? 2 : 3;
+    return `$${value.toFixed(decimals)}${unit}`;
+  }
+
+  function renderTripMeta() {
+    if (!tripMeta) return;
+    if (!lastTripMetric) {
+      tripMeta.hidden = true;
+      tripMeta.innerHTML = '';
+      return;
+    }
+    const items = [];
+    if (lastTripVehicleName) {
+      items.push({ text: lastTripVehicleName, truncate: true });
+    }
+    const distanceLabel = formatTripDistance();
+    if (distanceLabel) items.push({ text: distanceLabel });
+    const priceLabel = formatTripPrice();
+    if (priceLabel) items.push({ text: priceLabel });
+
+    tripMeta.innerHTML = items
+      .map(({ text, truncate }) => {
+        const cls = truncate ? 'trip-meta-item trip-meta-item--truncate' : 'trip-meta-item';
+        return `<span class="${cls}">${escapeHtml(text)}</span>`;
+      })
+      .join('');
+    tripMeta.hidden = items.length === 0;
+  }
+
   function effectiveSettings() {
     return lastTripFuelOverride
       ? { ...settings, fuelType: lastTripFuelOverride }
@@ -465,6 +513,7 @@
   function refreshResultTargetsFromSettings() {
     if (!lastTripMetric) return;
     setResultTargets(computeFromMetric(lastTripMetric, effectiveSettings()));
+    renderTripMeta();
   }
 
   // ---------- Form-value unit conversion ----------
@@ -636,9 +685,11 @@
 
     lastTripMetric = toMetricTrip(inputs, settings);
     lastTripFuelOverride = null;
+    lastTripVehicleName = null;
     const result = computeFromMetric(lastTripMetric, settings);
     showScreen(resultsScreen);
     applySettingsToUI(); // refresh CO2 subtitle based on current fuel
+    renderTripMeta();
     renderResultsInitial(result);
     spawnEffect(getEffectKind(lastTripMetric.economyL100km));
   });
@@ -663,10 +714,12 @@
       pricePerL: priceToMetric(price, settings.units),
     };
     lastTripFuelOverride = vehicle.fuelType;
+    lastTripVehicleName = vehicleTitle(vehicle);
     const result = computeFromMetric(lastTripMetric, effectiveSettings());
 
     showScreen(resultsScreen);
     applySettingsToUI(); // CO2 subtitle now reflects vehicle's fuel
+    renderTripMeta();
     renderResultsInitial(result);
     spawnEffect(getEffectKind(economyL100km));
   });
@@ -677,6 +730,8 @@
     savedForm.reset();
     lastTripMetric = null;
     lastTripFuelOverride = null;
+    lastTripVehicleName = null;
+    renderTripMeta();
     showScreen(inputScreen);
     applySettingsToUI();
     if (settings.homeMode === 'manual') {

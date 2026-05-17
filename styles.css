@@ -250,6 +250,54 @@ body {
   gap: 14px;
 }
 
+/* Trip context row above the result cards — typography matches the section
+   tags in the settings pane (small, uppercase, faint, wide tracking). The
+   pill container gives subtle visual separation from neighboring content.
+   Stays on one line; vehicle item truncates when space is tight so the
+   distance and price are always visible. */
+.trip-meta {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 8px 0 24px;
+  padding: 8px 18px;
+  background: var(--surface);
+  border-radius: 999px;
+}
+
+.trip-meta-item {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.trip-meta-item--truncate {
+  display: block;            /* needed for text-overflow */
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trip-meta-item + .trip-meta-item::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 11px;
+  background: currentColor;
+  opacity: 0.55;
+  margin: 0 12px;
+  flex-shrink: 0;
+}
+
 /* Input card */
 .input-card {
   background: var(--surface);
